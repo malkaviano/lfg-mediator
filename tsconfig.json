@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "paths": {
-      "@/group/*": ["src/group-organizer/*"],
+      "@/players/*": ["src/players/*"],
       "@/dungeon/*": ["src/dungeon/*"],
       "@/helper/*": ["src/helper/*"],
       "@/config/*": ["src/config/*"],
