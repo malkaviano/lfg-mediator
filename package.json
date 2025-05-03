@@ -39,6 +39,7 @@
     "@types/node": "^22.10.7",
     "@types/supertest": "^6.0.2",
     "eslint": "^9.18.0",
+    "eslint-config-love": "^119.0.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.2",
     "globals": "^16.0.0",
@@ -59,15 +60,25 @@
       "json",
       "ts"
     ],
-    "rootDir": "src",
+    "rootDir": ".",
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
+      "^.+\\.ts$": "ts-jest"
     },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],
     "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "modulePaths": [
+      "<rootDir>"
+    ],
+    "moduleNameMapper": {
+      "^@/group/(.*)$": "<rootDir>/src/group-organizer/$1",
+      "^@/dungeon/(.*)$": "<rootDir>/src/dungeon/$1",
+      "^@/helper/(.*)$": "<rootDir>/src/helper/$1",
+      "^@/config/(.*)$": "<rootDir>/src/config/$1",
+      "^@/infra/(.*)$": "<rootDir>/src/infra/$1"
+    }
   }
 }
