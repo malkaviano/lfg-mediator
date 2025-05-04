@@ -16,12 +16,12 @@ export class PlayersService {
   private readonly logger: Logger = new Logger(PlayersService.name);
 
   constructor(
-    // @Inject(QueuedPlayersRepositoryToken)
-    // private readonly queuePlayersRepository: QueuedPlayersRepository,
+    @Inject(QueuedPlayersRepositoryToken)
+    private readonly queuePlayersRepository: QueuedPlayersRepository,
     private readonly dateTimeHelper: DateTimeHelper,
   ) {}
 
-  async queue(
+  public async queue(
     request: PlayersQueueRequest | PlayersQueueMessage,
   ): Promise<{ result: boolean; errorMsg?: string }> {
     const timestamp = this.dateTimeHelper.timestamp();
@@ -89,7 +89,7 @@ export class PlayersService {
     }
 
     try {
-      // await this.queuePlayersRepository.queue(players);
+      await this.queuePlayersRepository.queue(players);
 
       this.logger.debug(`queued ${JSON.stringify(players)}`);
     } catch (error) {
@@ -102,11 +102,9 @@ export class PlayersService {
     return obj;
   }
 
-  async dequeue(request: PlayersDequeueRequest): Promise<number> {
+  public async dequeue(request: PlayersDequeueRequest): Promise<number> {
     const { playerIds } = request;
 
-    // return this.queuePlayersRepository.dequeue(playerIds);
-
-    return 0;
+    return this.queuePlayersRepository.dequeue(playerIds);
   }
 }
