@@ -2,21 +2,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { mock } from 'ts-jest-mocker';
 
-import { GroupQueueRequest } from '@/players/dto/group-queue.request';
+import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
 import { QueuedPlayerEntity } from '@/players/entity/queued-player.entity';
 import { DateTimeHelper } from '@/helper/datetime.helper';
 import { PlayerLevel } from '@/dungeon/player-level.literal';
 import { PlayerRole } from '@/dungeon/player-role.literal';
 import { DungeonName } from '@/dungeon/dungeon-name.literal';
-import { GroupDequeueRequest } from '@/players/dto/group-dequeue.request';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import {
   QueuedPlayersRepository,
   QueuedPlayersRepositoryToken,
 } from '@/players/interface/queued-players-repository.interface';
-import { PlayersReturnMessage } from '@/players/dto/players-return.message';
+import { PlayersService } from '@/players/players.service';
 
 describe('PlayersService', () => {
-  let service: GroupQueueingService;
+  let service: PlayersService;
 
   const mockedQueuedPlayersRepository = mock<QueuedPlayersRepository>();
 
@@ -29,7 +29,7 @@ describe('PlayersService', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        GroupQueueingService,
+        PlayersService,
         {
           provide: QueuedPlayersRepositoryToken,
           useValue: mockedQueuedPlayersRepository,
@@ -41,7 +41,7 @@ describe('PlayersService', () => {
       ],
     }).compile();
 
-    service = module.get<GroupQueueingService>(GroupQueueingService);
+    service = module.get<PlayersService>(PlayersService);
   });
 
   it('should be defined', () => {
@@ -50,7 +50,7 @@ describe('PlayersService', () => {
 
   describe('queue', () => {
     it('sanitize values and queue', async () => {
-      const body: GroupQueueRequest = {
+      const body: PlayersQueueRequest = {
         players: [
           {
             id: 'id1',
@@ -99,7 +99,7 @@ describe('PlayersService', () => {
     });
 
     it('validate player level', async () => {
-      const body: GroupQueueRequest = {
+      const body: PlayersQueueRequest = {
         players: [
           {
             id: 'id1',
@@ -207,44 +207,13 @@ describe('PlayersService', () => {
 
   describe('dequeue', () => {
     it('remove waiting players', async () => {
-      const body: GroupDequeueRequest = {
+      const body: PlayersDequeueRequest = {
         playerIds: ['id1', 'id2'],
       };
 
-      mockedQueuedPlayersRepository.get.mockResolvedValueOnce([
-        new QueuedPlayerEntity(
-          'id1',
-          20,
-          ['Tank', 'Damage'],
-          ['RagefireChasm', 'Deadmines'],
-          timestamp,
-        ),
-        new QueuedPlayerEntity(
-          'id2',
-          21,
-          ['Healer'],
-          ['RagefireChasm', 'Deadmines'],
-          timestamp,
-        ),
-      ]);
-
-      mockedQueuedPlayersRepository.remove.mockResolvedValueOnce(2);
+      mockedQueuedPlayersRepository.dequeue.mockResolvedValueOnce(2);
 
       const result = await service.dequeue(body);
-
-      expect(result).toEqual(2);
-    });
-  });
-
-  describe('return', () => {
-    it('change players back to waiting', async () => {
-      const message: PlayersReturnMessage = {
-        playerIds: ['id1', 'id2'],
-      };
-
-      mockedQueuedPlayersRepository.return.mockResolvedValueOnce(2);
-
-      const result = await service.return(message);
 
       expect(result).toEqual(2);
     });

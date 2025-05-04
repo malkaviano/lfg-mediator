@@ -2,7 +2,7 @@ import { PlayerLevel } from '@/dungeon/player-level.literal';
 import { DungeonName } from '@/dungeon/dungeon-name.literal';
 import { PlayerRole } from '@/dungeon/player-role.literal';
 
-export interface GroupQueueRequest {
+export interface PlayersQueueRequest {
   readonly players: PlayerQueueRequest[];
   readonly dungeons: DungeonName[];
 }

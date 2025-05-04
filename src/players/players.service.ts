@@ -1,22 +1,23 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { GroupQueueRequest as PlayersQueueRequest } from '@/players/dto/group-queue.request';
+import { PlayersQueueRequest as PlayersQueueRequest } from '@/players/dto/players-queue.request';
 import { QueuedPlayerEntity } from '@/players/entity/queued-player.entity';
 import { DateTimeHelper } from '@/helper/datetime.helper';
 import { DungeonService } from '@/dungeon/dungeon.service';
-import { GroupDequeueRequest } from '@/players/dto/group-dequeue.request';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import {
   QueuedPlayersRepository,
   QueuedPlayersRepositoryToken,
 } from '@/players/interface/queued-players-repository.interface';
 import { PlayersQueueMessage } from '@/players/dto/players-queue.message';
-import { PlayersReturnMessage } from '@/players/dto/players-return.message';
 
 @Injectable()
 export class PlayersService {
+  private readonly logger: Logger = new Logger(PlayersService.name);
+
   constructor(
-    @Inject(QueuedPlayersRepositoryToken)
-    private readonly queuePlayersRepository: QueuedPlayersRepository,
+    // @Inject(QueuedPlayersRepositoryToken)
+    // private readonly queuePlayersRepository: QueuedPlayersRepository,
     private readonly dateTimeHelper: DateTimeHelper,
   ) {}
 
@@ -88,8 +89,12 @@ export class PlayersService {
     }
 
     try {
-      await this.queuePlayersRepository.queue(players);
+      // await this.queuePlayersRepository.queue(players);
+
+      this.logger.debug(`queued ${JSON.stringify(players)}`);
     } catch (error) {
+      this.logger.error(error);
+
       obj.result = false;
       obj.errorMsg = 'one or more players are already queued';
     }
@@ -97,13 +102,11 @@ export class PlayersService {
     return obj;
   }
 
-  async dequeue(request: GroupDequeueRequest): Promise<number> {
+  async dequeue(request: PlayersDequeueRequest): Promise<number> {
     const { playerIds } = request;
 
-    return this.queuePlayersRepository.remove(playerIds);
-  }
+    // return this.queuePlayersRepository.dequeue(playerIds);
 
-  async return(message: PlayersReturnMessage): Promise<number> {
-    return this.queuePlayersRepository.return(message.playerIds);
+    return 0;
   }
 }

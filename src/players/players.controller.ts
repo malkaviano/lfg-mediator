@@ -7,17 +7,18 @@ import {
   Post,
 } from '@nestjs/common';
 
-import { GroupQueueRequest } from '@/players/dto/group-queue.request';
-import { GroupDequeueRequest } from '@/players/dto/group-dequeue.request';
+import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
+import { PlayersService } from '@/players/players.service';
 
 @Controller('players')
 export class PlayersController {
-  constructor(private readonly groupOrganizerService: GroupQueueingService) {}
+  constructor(private readonly playersService: PlayersService) {}
 
   @Post('queue')
-  public async queue(@Body() request: GroupQueueRequest): Promise<void> {
+  public async queue(@Body() request: PlayersQueueRequest): Promise<void> {
     const { result, errorMsg = 'unknown error' } =
-      await this.groupOrganizerService.queue(request);
+      await this.playersService.queue(request);
 
     if (!result) {
       throw new HttpException(errorMsg, HttpStatus.BAD_REQUEST);
@@ -25,8 +26,8 @@ export class PlayersController {
   }
 
   @Post('remove')
-  @HttpCode(200)
-  public async dequeue(@Body() request: GroupDequeueRequest): Promise<void> {
-    await this.groupOrganizerService.dequeue(request);
+  @HttpCode(204)
+  public async dequeue(@Body() request: PlayersDequeueRequest): Promise<void> {
+    await this.playersService.dequeue(request);
   }
 }

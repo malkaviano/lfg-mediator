@@ -25,6 +25,7 @@
     "@nestjs/core": "^11.0.1",
     "@nestjs/microservices": "^11.1.0",
     "@nestjs/platform-express": "^11.0.1",
+    "mongodb": "^6.16.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "uuid": "^11.1.0"
@@ -71,7 +72,7 @@
       "^.+\\.ts$": "ts-jest"
     },
     "collectCoverageFrom": [
-      "**/*.(t|j)s"
+      "**/*.ts"
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
@@ -79,7 +80,7 @@
       "<rootDir>"
     ],
     "moduleNameMapper": {
-      "^@/group/(.*)$": "<rootDir>/src/group-organizer/$1",
+      "^@/players/(.*)$": "<rootDir>/src/players/$1",
       "^@/dungeon/(.*)$": "<rootDir>/src/dungeon/$1",
       "^@/helper/(.*)$": "<rootDir>/src/helper/$1",
       "^@/config/(.*)$": "<rootDir>/src/config/$1",

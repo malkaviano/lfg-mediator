@@ -4,13 +4,14 @@ import { HttpException } from '@nestjs/common';
 import { mock } from 'ts-jest-mocker';
 
 import { PlayersController } from '@/players/players.controller';
-import { GroupQueueRequest } from '@/players/dto/group-queue.request';
-import { GroupDequeueRequest } from '@/players/dto/group-dequeue.request';
+import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
+import { PlayersService } from '@/players/players.service';
 
 describe('PlayersController', () => {
   let controller: PlayersController;
 
-  const mockedGroupOrganizerService = mock(GroupQueueingService);
+  const mockedGroupOrganizerService = mock(PlayersService);
 
   beforeEach(async () => {
     jest.resetAllMocks();
@@ -19,7 +20,7 @@ describe('PlayersController', () => {
       controllers: [PlayersController],
       providers: [
         {
-          provide: GroupQueueingService,
+          provide: PlayersService,
           useValue: mockedGroupOrganizerService,
         },
       ],
@@ -34,7 +35,7 @@ describe('PlayersController', () => {
 
   describe('queue', () => {
     it('queue players', async () => {
-      const body: GroupQueueRequest = {
+      const body: PlayersQueueRequest = {
         players: [
           {
             id: 'id1',
@@ -61,7 +62,7 @@ describe('PlayersController', () => {
 
     describe('when service fails', () => {
       it('throw HttpException', async () => {
-        const body: GroupQueueRequest = {
+        const body: PlayersQueueRequest = {
           players: [
             {
               id: 'id1',
@@ -88,7 +89,7 @@ describe('PlayersController', () => {
 
   describe('dequeue', () => {
     it('remove players from queue', async () => {
-      const body: GroupDequeueRequest = {
+      const body: PlayersDequeueRequest = {
         playerIds: ['id1', 'id2'],
       };
 
