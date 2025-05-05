@@ -8,8 +8,8 @@ import {
 } from '@nestjs/common';
 
 import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
-import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import { PlayersService } from '@/players/players.service';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 
 @Controller('players')
 export class PlayersController {
@@ -28,6 +28,11 @@ export class PlayersController {
   @Post('remove')
   @HttpCode(204)
   public async dequeue(@Body() request: PlayersDequeueRequest): Promise<void> {
-    await this.playersService.dequeue(request);
+    const { result, errorMsg = 'unknown error' } =
+      await this.playersService.dequeue(request);
+
+    if (!result) {
+      throw new HttpException(errorMsg, HttpStatus.BAD_REQUEST);
+    }
   }
 }

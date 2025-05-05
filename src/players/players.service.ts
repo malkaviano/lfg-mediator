@@ -1,40 +1,34 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
 import { PlayersQueueRequest as PlayersQueueRequest } from '@/players/dto/players-queue.request';
-import { QueuedPlayerEntity } from '@/players/entity/queued-player.entity';
 import { DateTimeHelper } from '@/helper/datetime.helper';
 import { DungeonService } from '@/dungeon/dungeon.service';
 import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import {
-  QueuedPlayersRepository,
-  QueuedPlayersRepositoryToken,
-} from '@/players/interface/queued-players-repository.interface';
-import { PlayersQueueMessage } from '@/players/dto/players-queue.message';
+  PlayersProducer,
+  QueueClientToken,
+} from '@/players/interface/players-producer.interface';
 
 @Injectable()
 export class PlayersService {
   private readonly logger: Logger = new Logger(PlayersService.name);
 
   constructor(
-    @Inject(QueuedPlayersRepositoryToken)
-    private readonly queuePlayersRepository: QueuedPlayersRepository,
+    @Inject(QueueClientToken)
+    private readonly playersProducer: PlayersProducer,
     private readonly dateTimeHelper: DateTimeHelper,
   ) {}
 
   public async queue(
-    request: PlayersQueueRequest | PlayersQueueMessage,
+    request: PlayersQueueRequest,
   ): Promise<{ result: boolean; errorMsg?: string }> {
-    const timestamp = this.dateTimeHelper.timestamp();
-
-    const party = { tank: 0, healer: 0, damage: 0 };
+    const group = { tank: 0, healer: 0, damage: 0 };
 
     const obj: { result: boolean; errorMsg?: string } = {
       result: true,
     };
 
-    const playerIds = request.players.map((p) => p.id);
-
-    const players = request.players.map((p) => {
+    for (const p of request.players) {
       const roles = [...new Set(p.roles)];
 
       roles.reduce((acc, role) => {
@@ -51,7 +45,7 @@ export class PlayersService {
         }
 
         return acc;
-      }, party);
+      }, group);
 
       const dungeons = [...new Set(request.dungeons)];
 
@@ -59,39 +53,43 @@ export class PlayersService {
         obj.result = false;
         obj.errorMsg =
           'one or more players have incorrect level for selected dungeons';
+
+        return obj;
       }
 
-      const entity = new QueuedPlayerEntity(
-        p.id,
-        p.level,
-        roles,
-        dungeons,
-        timestamp,
-        playerIds.filter((id) => id !== p.id),
-      );
+      if (group.tank > 1) {
+        obj.result = false;
+        obj.errorMsg = 'a group cannot have more than one tank';
 
-      return entity;
-    });
+        return obj;
+      }
 
-    if (party.tank > 1) {
-      obj.result = false;
-      obj.errorMsg = 'a group cannot have more than one tank';
-    } else if (party.healer > 1) {
-      obj.result = false;
-      obj.errorMsg = 'a group cannot have more than one healer';
-    } else if (party.damage > 3) {
-      obj.result = false;
-      obj.errorMsg = 'a group cannot have more than three damage dealers';
-    }
+      if (group.healer > 1) {
+        obj.result = false;
+        obj.errorMsg = 'a group cannot have more than one healer';
 
-    if (!obj.result) {
-      return obj;
+        return obj;
+      }
+
+      if (group.damage > 3) {
+        obj.result = false;
+        obj.errorMsg = 'a group cannot have more than three damage dealers';
+
+        return obj;
+      }
     }
 
     try {
-      await this.queuePlayersRepository.queue(players);
+      const timestamp = this.dateTimeHelper.timestamp();
 
-      this.logger.debug(`queued ${JSON.stringify(players)}`);
+      const message = {
+        ...request,
+        queuedAt: timestamp,
+      };
+
+      await this.playersProducer.publishQueued(message);
+
+      this.logger.debug(`queued ${JSON.stringify(message)}`);
     } catch (error) {
       this.logger.error(error);
 
@@ -102,9 +100,26 @@ export class PlayersService {
     return obj;
   }
 
-  public async dequeue(request: PlayersDequeueRequest): Promise<number> {
-    const { playerIds } = request;
+  public async dequeue(
+    request: PlayersDequeueRequest,
+  ): Promise<{ result: boolean; errorMsg?: string }> {
+    try {
+      const timestamp = this.dateTimeHelper.timestamp();
 
-    return this.queuePlayersRepository.dequeue(playerIds);
+      const message = {
+        ...request,
+        processedAt: timestamp,
+      };
+
+      await this.playersProducer.publishDequeued(message);
+
+      this.logger.debug(`queued ${JSON.stringify(message)}`);
+
+      return { result: true };
+    } catch (error) {
+      this.logger.error(error);
+
+      return { result: false, errorMsg: JSON.stringify(error) };
+    }
   }
 }

@@ -5,8 +5,8 @@ import { mock } from 'ts-jest-mocker';
 
 import { PlayersController } from '@/players/players.controller';
 import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
-import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import { PlayersService } from '@/players/players.service';
+import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 
 describe('PlayersController', () => {
   let controller: PlayersController;
@@ -93,11 +93,30 @@ describe('PlayersController', () => {
         playerIds: ['id1', 'id2'],
       };
 
-      mockedGroupOrganizerService.dequeue.mockResolvedValueOnce(2);
+      mockedGroupOrganizerService.dequeue.mockResolvedValueOnce({
+        result: true,
+      });
 
       await controller.dequeue(body);
 
       expect(mockedGroupOrganizerService.dequeue).toHaveBeenCalled();
+    });
+
+    describe('when service fails', () => {
+      it('throw HttpException', async () => {
+        const body: PlayersDequeueRequest = {
+          playerIds: ['id1', 'id2'],
+        };
+
+        mockedGroupOrganizerService.dequeue.mockResolvedValueOnce({
+          result: false,
+          errorMsg: 'Player cannot be dequeued',
+        });
+
+        await expect(controller.dequeue(body)).rejects.toThrow(
+          'Player cannot be dequeued',
+        );
+      });
     });
   });
 });

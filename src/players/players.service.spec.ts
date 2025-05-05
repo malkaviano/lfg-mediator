@@ -3,22 +3,21 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { mock } from 'ts-jest-mocker';
 
 import { PlayersQueueRequest } from '@/players/dto/players-queue.request';
-import { QueuedPlayerEntity } from '@/players/entity/queued-player.entity';
 import { DateTimeHelper } from '@/helper/datetime.helper';
 import { PlayerLevel } from '@/dungeon/player-level.literal';
 import { PlayerRole } from '@/dungeon/player-role.literal';
 import { DungeonName } from '@/dungeon/dungeon-name.literal';
-import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
-import {
-  QueuedPlayersRepository,
-  QueuedPlayersRepositoryToken,
-} from '@/players/interface/queued-players-repository.interface';
 import { PlayersService } from '@/players/players.service';
+import {
+  PlayersProducer,
+  QueueClientToken,
+} from '@/players/interface/players-producer.interface';
+import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
 
 describe('PlayersService', () => {
   let service: PlayersService;
 
-  const mockedQueuedPlayersRepository = mock<QueuedPlayersRepository>();
+  const mockedPlayersProducer = mock<PlayersProducer>();
 
   const mockedDateTimeHelper = mock(DateTimeHelper);
 
@@ -31,8 +30,8 @@ describe('PlayersService', () => {
       providers: [
         PlayersService,
         {
-          provide: QueuedPlayersRepositoryToken,
-          useValue: mockedQueuedPlayersRepository,
+          provide: QueueClientToken,
+          useValue: mockedPlayersProducer,
         },
         {
           provide: DateTimeHelper,
@@ -66,36 +65,20 @@ describe('PlayersService', () => {
         dungeons: ['RagefireChasm', 'Deadmines', 'RagefireChasm', 'Deadmines'],
       };
 
-      const expected: QueuedPlayerEntity[] = [
-        new QueuedPlayerEntity(
-          'id1',
-          20,
-          ['Tank', 'Damage'],
-          ['RagefireChasm', 'Deadmines'],
-          timestamp,
-          ['id2'],
-        ),
-        new QueuedPlayerEntity(
-          'id2',
-          21,
-          ['Healer'],
-          ['RagefireChasm', 'Deadmines'],
-          timestamp,
-          ['id1'],
-        ),
-      ];
-
       mockedDateTimeHelper.timestamp.mockReturnValueOnce(timestamp);
 
-      mockedQueuedPlayersRepository.queue.mockResolvedValueOnce(2);
+      mockedPlayersProducer.publishQueued.mockResolvedValueOnce();
 
       const result = await service.queue(body);
 
       expect(result).toEqual({ result: true });
 
-      expect(mockedQueuedPlayersRepository.queue).toHaveBeenCalledWith(
-        expected,
-      );
+      const message = {
+        ...body,
+        queuedAt: timestamp,
+      };
+
+      expect(mockedPlayersProducer.publishQueued).toHaveBeenCalledWith(message);
     });
 
     it('validate player level', async () => {
@@ -207,15 +190,41 @@ describe('PlayersService', () => {
 
   describe('dequeue', () => {
     it('remove waiting players', async () => {
-      const body: PlayersDequeueRequest = {
+      const message: PlayersDequeueMessage = {
         playerIds: ['id1', 'id2'],
+        processedAt: timestamp,
       };
 
-      mockedQueuedPlayersRepository.dequeue.mockResolvedValueOnce(2);
+      mockedDateTimeHelper.timestamp.mockReturnValueOnce(timestamp);
 
-      const result = await service.dequeue(body);
+      mockedPlayersProducer.publishDequeued.mockResolvedValueOnce();
 
-      expect(result).toEqual(2);
+      const result = await service.dequeue(message);
+
+      expect(result).toEqual({ result: true });
+
+      expect(mockedPlayersProducer.publishDequeued).toHaveBeenCalledWith(
+        message,
+      );
+    });
+
+    describe('when an error occur', () => {
+      it('return false with error message', async () => {
+        const message: PlayersDequeueMessage = {
+          playerIds: ['id1', 'id2'],
+          processedAt: timestamp,
+        };
+
+        mockedDateTimeHelper.timestamp.mockReturnValueOnce(timestamp);
+
+        mockedPlayersProducer.publishDequeued.mockRejectedValueOnce(
+          'Unexpected',
+        );
+
+        const result = await service.dequeue(message);
+
+        expect(result).toEqual({ result: false, errorMsg: '"Unexpected"' });
+      });
     });
   });
 });

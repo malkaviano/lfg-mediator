@@ -2,7 +2,7 @@ import { ClientsModule, RmqOptions } from '@nestjs/microservices';
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { QueueClientToken } from '@/players/interface/group-producer.interface';
+import { QueueClientToken } from '@/players/interface/players-producer.interface';
 
 @Module({
   imports: [
