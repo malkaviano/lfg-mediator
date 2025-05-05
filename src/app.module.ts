@@ -4,15 +4,23 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DungeonModule } from '@/dungeon/dungeon.module';
 import { PlayersModule } from '@/players/players.module';
 import { MongodbModule } from '@/infra/mongo/mongodb.module';
+import { QueueModule } from '@/infra/queue/queue.module';
 
 import mongoConnection from '@/config/mongo-connection.config';
 import mongoCollection from '@/config/mongo-collection.config';
+import rabbitClientConfig from '@/config/rmq-proxy.config';
+import rabbitConfig from '@/config/rmq.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [mongoConnection, mongoCollection],
+      load: [
+        mongoConnection,
+        mongoCollection,
+        rabbitClientConfig,
+        rabbitConfig,
+      ],
     }),
     DungeonModule,
     PlayersModule,
@@ -30,6 +38,7 @@ import mongoCollection from '@/config/mongo-collection.config';
       },
       inject: [ConfigService],
     }),
+    QueueModule,
   ],
   controllers: [],
   providers: [],
