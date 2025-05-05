@@ -25,7 +25,7 @@ export class PlayersController {
     }
   }
 
-  @Post('remove')
+  @Post('dequeue')
   @HttpCode(204)
   public async dequeue(@Body() request: PlayersDequeueRequest): Promise<void> {
     const { result, errorMsg = 'unknown error' } =

@@ -10,7 +10,7 @@ import { DungeonName } from '@/dungeon/dungeon-name.literal';
 import { PlayersService } from '@/players/players.service';
 import {
   PlayersProducer,
-  QueueClientToken,
+  PlayersProducerToken,
 } from '@/players/interface/players-producer.interface';
 import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
 
@@ -30,7 +30,7 @@ describe('PlayersService', () => {
       providers: [
         PlayersService,
         {
-          provide: QueueClientToken,
+          provide: PlayersProducerToken,
           useValue: mockedPlayersProducer,
         },
         {

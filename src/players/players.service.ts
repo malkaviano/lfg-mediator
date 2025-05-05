@@ -6,7 +6,7 @@ import { DungeonService } from '@/dungeon/dungeon.service';
 import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
 import {
   PlayersProducer,
-  QueueClientToken,
+  PlayersProducerToken,
 } from '@/players/interface/players-producer.interface';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class PlayersService {
   private readonly logger: Logger = new Logger(PlayersService.name);
 
   constructor(
-    @Inject(QueueClientToken)
+    @Inject(PlayersProducerToken)
     private readonly playersProducer: PlayersProducer,
     private readonly dateTimeHelper: DateTimeHelper,
   ) {}
@@ -28,8 +28,8 @@ export class PlayersService {
       result: true,
     };
 
-    for (const p of request.players) {
-      const roles = [...new Set(p.roles)];
+    for (const player of request.players) {
+      const roles = [...new Set(player.roles)];
 
       roles.reduce((acc, role) => {
         switch (role) {
@@ -49,7 +49,7 @@ export class PlayersService {
 
       const dungeons = [...new Set(request.dungeons)];
 
-      if (!DungeonService.checkPlayerLevel(dungeons, p.level)) {
+      if (!DungeonService.checkPlayerLevel(dungeons, player.level)) {
         obj.result = false;
         obj.errorMsg =
           'one or more players have incorrect level for selected dungeons';

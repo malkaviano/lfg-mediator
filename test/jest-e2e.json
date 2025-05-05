@@ -1,9 +1,17 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "../",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "modulePaths": ["<rootDir>"],
+  "moduleNameMapper": {
+    "^@/players/(.*)$": "<rootDir>/src/players/$1",
+    "^@/dungeon/(.*)$": "<rootDir>/src/dungeon/$1",
+    "^@/helper/(.*)$": "<rootDir>/src/helper/$1",
+    "^@/config/(.*)$": "<rootDir>/src/config/$1",
+    "^@/infra/(.*)$": "<rootDir>/src/infra/$1"
   }
 }

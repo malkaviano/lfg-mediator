@@ -1,7 +1,7 @@
 import { PlayersQueueMessage } from '@/players/dto/players-queue.message';
 import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
 
-export const GroupProducedToken = Symbol('GroupProduced');
+export const PlayersProducerToken = Symbol('PlayersProducer');
 
 export const QueueClientToken = Symbol('QueueClient');
 

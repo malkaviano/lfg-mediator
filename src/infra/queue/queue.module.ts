@@ -1,9 +1,14 @@
 import { ClientsModule, RmqOptions } from '@nestjs/microservices';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { QueueClientToken } from '@/players/interface/players-producer.interface';
+import {
+  PlayersProducerToken,
+  QueueClientToken,
+} from '@/players/interface/players-producer.interface';
+import { PlayersProducerService } from '@/infra/queue/players-producer.service';
 
+@Global()
 @Module({
   imports: [
     ClientsModule.registerAsync([
@@ -16,6 +21,17 @@ import { QueueClientToken } from '@/players/interface/players-producer.interface
     ]),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: PlayersProducerToken,
+      useClass: PlayersProducerService,
+    },
+  ],
+  exports: [
+    {
+      provide: PlayersProducerToken,
+      useClass: PlayersProducerService,
+    },
+  ],
 })
 export class QueueModule {}
