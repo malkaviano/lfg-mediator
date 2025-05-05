@@ -5,17 +5,24 @@ import { PlayerLevel } from '@/dungeon/player-level.literal';
 import { QueuedPlayerEntity } from '@/players/entity/queued-player.entity';
 
 export class QueuedPlayerModel {
+  public groupId?: string;
+
+  public askedAt?: string;
+
+  public returnedAt?: string;
+
+  public status: PlayerStatus;
+
   constructor(
     public id: string,
     public level: PlayerLevel,
     public roles: PlayerRole[],
     public dungeons: DungeonName[],
     public queuedAt: string,
-    public status: PlayerStatus,
     public playingWith: string[],
-    public groupId?: string,
-    public groupedAt?: string,
-  ) {}
+  ) {
+    this.status = 'ACCEPTED';
+  }
 
   public static create(
     queuedPlayerEntity: QueuedPlayerEntity,
@@ -26,7 +33,6 @@ export class QueuedPlayerModel {
       queuedPlayerEntity.roles,
       queuedPlayerEntity.dungeons,
       queuedPlayerEntity.queuedAt,
-      'ACCEPTED',
       queuedPlayerEntity.playingWith,
     );
   }
