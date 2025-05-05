@@ -1,4 +1,4 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Global, Module } from '@nestjs/common';
 
 import {
   MongoDbDriverModuleOptions,
@@ -9,6 +9,7 @@ import { HelperModule } from '@/helper/helper.module';
 import { MongoQueuedPlayersRepository } from '@/infra/mongo/queued-players.repository';
 import { QueuedPlayersRepositoryToken } from '@/players/interface/queued-players-repository.interface';
 
+@Global()
 @Module({
   imports: [HelperModule],
   providers: [
