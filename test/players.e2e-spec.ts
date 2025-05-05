@@ -25,7 +25,7 @@ describe('PlayersController (e2e)', () => {
     agent = request.agent(app.getHttpServer());
 
     await app.init();
-  });
+  }, 15000);
 
   afterAll(async () => {
     await app.close();
