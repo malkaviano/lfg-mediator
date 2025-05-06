@@ -5,11 +5,12 @@ import { DungeonModule } from '@/dungeon/dungeon.module';
 import { PlayersModule } from '@/players/players.module';
 import { MongodbModule } from '@/infra/mongo/mongodb.module';
 import { QueueModule } from '@/infra/queue/queue.module';
+import { GroupsModule } from '@/groups/groups.module';
 
 import mongoConnection from '@/config/mongo-connection.config';
 import mongoCollection from '@/config/mongo-collection.config';
-import rabbitClientConfig from '@/config/rmq-players-proxy.config';
-import rabbitConfig from '@/config/rmq.config';
+import rabbitPlayersClientConfig from '@/config/rmq-players-proxy.config';
+import rabbitGroupsConfig from '@/config/rmq-groups.config';
 
 @Module({
   imports: [
@@ -18,12 +19,13 @@ import rabbitConfig from '@/config/rmq.config';
       load: [
         mongoConnection,
         mongoCollection,
-        rabbitClientConfig,
-        rabbitConfig,
+        rabbitPlayersClientConfig,
+        rabbitGroupsConfig,
       ],
     }),
     DungeonModule,
     PlayersModule,
+    GroupsModule,
     MongodbModule.forRootAsync({
       useFactory(config: ConfigService) {
         const values = config.get('mongoConnection') as {

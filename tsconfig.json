@@ -20,6 +20,7 @@
     "strict": true,
     "paths": {
       "@/players/*": ["src/players/*"],
+      "@/groups/*": ["src/groups/*"],
       "@/dungeon/*": ["src/dungeon/*"],
       "@/helper/*": ["src/helper/*"],
       "@/config/*": ["src/config/*"],

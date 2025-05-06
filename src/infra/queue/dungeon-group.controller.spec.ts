@@ -4,19 +4,22 @@ import { RmqContext } from '@nestjs/microservices';
 import { mock } from 'ts-jest-mocker';
 
 import { DungeonGroupController } from '@/infra/queue/dungeon-group.controller';
-import { DungeonGroupMessage } from '@/players/dto/dungeon-group.message';
+import { DungeonGroupMessage } from '@/groups/dto/dungeon-group.message';
+import { DungeonGroupsService } from '@/groups/dungeon-groups.service';
 
 describe('DungeonGroupController', () => {
   let controller: DungeonGroupController;
 
   const mockedRabbitMQContext = mock(RmqContext);
 
-  // const timestamp = '2025-04-01T11:42:19.088Z';
+  const mockedDungeonGroupsService = mock(DungeonGroupsService);
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [DungeonGroupController],
-      providers: [],
+      providers: [
+        { provide: DungeonGroupsService, useValue: mockedDungeonGroupsService },
+      ],
     }).compile();
 
     controller = module.get<DungeonGroupController>(DungeonGroupController);
@@ -30,19 +33,21 @@ describe('DungeonGroupController', () => {
     it('queue players and ack', async () => {
       let result = false;
 
-      // mockedGroupQueueingService.queue.mockResolvedValueOnce({ result: true });
+      mockedDungeonGroupsService.create.mockResolvedValueOnce(1);
 
       mockedRabbitMQContext.getChannelRef.mockImplementationOnce(() => ({
         ack: () => (result = true),
       }));
 
-      const message: DungeonGroupMessage = {
-        groupId: 'group1',
-        damage: ['dmg1', 'dmg2', 'dmg3'],
-        tank: 'tank1',
-        healer: 'healer1',
-        dungeon: 'Deadmines',
-      };
+      const message: DungeonGroupMessage[] = [
+        {
+          groupId: 'group1',
+          damage: ['dmg1', 'dmg2', 'dmg3'],
+          tank: 'tank1',
+          healer: 'healer1',
+          dungeon: 'Deadmines',
+        },
+      ];
 
       mockedRabbitMQContext.getMessage.mockImplementationOnce(() => ({
         data: message,
@@ -50,7 +55,7 @@ describe('DungeonGroupController', () => {
 
       await controller.handleDungeonGroup(message, mockedRabbitMQContext);
 
-      // expect(mockedGroupQueueingService.queue).toHaveBeenCalledWith(message);
+      expect(mockedDungeonGroupsService.create).toHaveBeenCalledWith(message);
 
       expect(result).toEqual(true);
     });

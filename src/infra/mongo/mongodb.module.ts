@@ -6,23 +6,23 @@ import {
 } from '@/infra/mongo/mongodb.options';
 import { CoreModule } from '@/infra/mongo/core.module';
 import { HelperModule } from '@/helper/helper.module';
-import { MongoQueuedPlayersRepository } from '@/infra/mongo/queued-players.repository';
-import { QueuedPlayersRepositoryToken } from '@/players/interface/queued-players-repository.interface';
+import { MongoDungeonGroupsRepository } from '@/infra/mongo/dungeon-groups.repository';
+import { DungeonGroupsRepositoryToken } from '@/groups/interface/dungeon-groups-repository.interface';
 
 @Global()
 @Module({
   imports: [HelperModule],
   providers: [
-    MongoQueuedPlayersRepository,
+    MongoDungeonGroupsRepository,
     {
-      provide: QueuedPlayersRepositoryToken,
-      useClass: MongoQueuedPlayersRepository,
+      provide: DungeonGroupsRepositoryToken,
+      useClass: MongoDungeonGroupsRepository,
     },
   ],
   exports: [
     {
-      provide: QueuedPlayersRepositoryToken,
-      useClass: MongoQueuedPlayersRepository,
+      provide: DungeonGroupsRepositoryToken,
+      useClass: MongoDungeonGroupsRepository,
     },
   ],
 })

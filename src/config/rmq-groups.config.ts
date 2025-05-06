@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
 
-export default registerAs('rabbitConnection', () => ({
+export default registerAs('rabbitGroupsConnection', () => ({
   transport: Transport.RMQ,
   options: {
     urls: [

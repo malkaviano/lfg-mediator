@@ -4,11 +4,13 @@ import { ConfigService } from '@nestjs/config';
 
 import { PlayersProducerService } from '@/infra/queue/players-producer.service';
 import { DungeonGroupController } from '@/infra/queue/dungeon-group.controller';
+import { GroupsModule } from '@/groups/groups.module';
 import { PlayerProducerProxyToken, PlayersProducerToken } from '../../tokens';
 
 @Global()
 @Module({
   imports: [
+    GroupsModule,
     ClientsModule.registerAsync([
       {
         name: PlayerProducerProxyToken,
