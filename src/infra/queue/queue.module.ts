@@ -13,7 +13,7 @@ import { PlayerProducerProxyToken, PlayersProducerToken } from '../../tokens';
       {
         name: PlayerProducerProxyToken,
         useFactory: (configService: ConfigService) =>
-          configService.get<RmqOptions>('rmqOptions')!,
+          configService.get<RmqOptions>('rmqPlayersOptions')!,
         inject: [ConfigService],
       },
     ]),

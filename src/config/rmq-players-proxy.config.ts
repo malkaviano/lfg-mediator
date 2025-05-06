@@ -1,7 +1,7 @@
 import { registerAs } from '@nestjs/config';
 import { Transport } from '@nestjs/microservices';
 
-export default registerAs('rmqOptions', () => ({
+export default registerAs('rmqPlayersOptions', () => ({
   transport: Transport.RMQ,
   options: {
     urls: [

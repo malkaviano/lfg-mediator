@@ -8,7 +8,7 @@ import { QueueModule } from '@/infra/queue/queue.module';
 
 import mongoConnection from '@/config/mongo-connection.config';
 import mongoCollection from '@/config/mongo-collection.config';
-import rabbitClientConfig from '@/config/rmq-proxy.config';
+import rabbitClientConfig from '@/config/rmq-players-proxy.config';
 import rabbitConfig from '@/config/rmq.config';
 
 @Module({
