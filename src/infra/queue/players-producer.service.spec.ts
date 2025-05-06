@@ -5,9 +5,9 @@ import { mock } from 'ts-jest-mocker';
 import { of } from 'rxjs';
 
 import { PlayersProducerService } from '@/infra/queue/players-producer.service';
-import { QueueClientToken } from '@/players/interface/players-producer.interface';
 import { PlayersQueueMessage } from '@/players/dto/players-queue.message';
 import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
+import { PlayerProducerProxyToken } from '../../tokens';
 
 describe('PlayersProducerService', () => {
   let service: PlayersProducerService;
@@ -20,7 +20,7 @@ describe('PlayersProducerService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PlayersProducerService,
-        { provide: QueueClientToken, useValue: mockedRmqClient },
+        { provide: PlayerProducerProxyToken, useValue: mockedRmqClient },
       ],
     }).compile();
 

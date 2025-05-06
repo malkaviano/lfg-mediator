@@ -9,3 +9,7 @@ export const MONGODB_DRIVER_OBJECT = 'MongoDbDriverObject';
 export const MONGODB_DRIVER_DB = 'MongoDbDriverDB';
 
 export const MONGODB_CONNECTION_NAME = 'MongoDbDriverConnection';
+
+export const PlayersProducerToken = Symbol('PlayersProducer');
+
+export const PlayerProducerProxyToken = Symbol('PlayerProducerProxy');

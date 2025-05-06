@@ -8,11 +8,9 @@ import { PlayerLevel } from '@/dungeon/player-level.literal';
 import { PlayerRole } from '@/dungeon/player-role.literal';
 import { DungeonName } from '@/dungeon/dungeon-name.literal';
 import { PlayersService } from '@/players/players.service';
-import {
-  PlayersProducer,
-  PlayersProducerToken,
-} from '@/players/interface/players-producer.interface';
+import { PlayersProducer } from '@/players/interface/players-producer.interface';
 import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
+import { PlayersProducerToken } from '../tokens';
 
 describe('PlayersService', () => {
   let service: PlayersService;

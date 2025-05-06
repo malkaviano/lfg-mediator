@@ -4,10 +4,8 @@ import { PlayersQueueRequest as PlayersQueueRequest } from '@/players/dto/player
 import { DateTimeHelper } from '@/helper/datetime.helper';
 import { DungeonService } from '@/dungeon/dungeon.service';
 import { PlayersDequeueRequest } from '@/players/dto/players-dequeue.request';
-import {
-  PlayersProducer,
-  PlayersProducerToken,
-} from '@/players/interface/players-producer.interface';
+import { PlayersProducer } from '@/players/interface/players-producer.interface';
+import { PlayersProducerToken } from '../tokens';
 
 @Injectable()
 export class PlayersService {

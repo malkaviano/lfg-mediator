@@ -9,12 +9,10 @@ import { ClientProxy } from '@nestjs/microservices';
 
 import { lastValueFrom } from 'rxjs';
 
-import {
-  PlayersProducer,
-  QueueClientToken,
-} from '@/players/interface/players-producer.interface';
 import { PlayersQueueMessage } from '@/players/dto/players-queue.message';
 import { PlayersDequeueMessage } from '@/players/dto/players-dequeue.message';
+import { PlayersProducer } from '@/players/interface/players-producer.interface';
+import { PlayerProducerProxyToken } from '../../tokens';
 
 @Injectable()
 export class PlayersProducerService
@@ -22,7 +20,9 @@ export class PlayersProducerService
 {
   private readonly logger: Logger = new Logger(PlayersProducerService.name);
 
-  constructor(@Inject(QueueClientToken) private readonly client: ClientProxy) {}
+  constructor(
+    @Inject(PlayerProducerProxyToken) private readonly client: ClientProxy,
+  ) {}
 
   async onApplicationBootstrap() {
     try {
