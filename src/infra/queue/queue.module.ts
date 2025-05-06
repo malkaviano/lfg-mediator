@@ -7,6 +7,7 @@ import {
   QueueClientToken,
 } from '@/players/interface/players-producer.interface';
 import { PlayersProducerService } from '@/infra/queue/players-producer.service';
+import { DungeonGroupController } from '@/infra/queue/dungeon-group.controller';
 
 @Global()
 @Module({
@@ -20,7 +21,7 @@ import { PlayersProducerService } from '@/infra/queue/players-producer.service';
       },
     ]),
   ],
-  controllers: [],
+  controllers: [DungeonGroupController],
   providers: [
     {
       provide: PlayersProducerToken,
